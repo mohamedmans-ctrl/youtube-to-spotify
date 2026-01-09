@@ -1,0 +1,22 @@
+name: 'Upload Episode from YouTube To Spotify'
+on:
+  push:
+    paths:
+      - episode.json
+    branches: [main] # تأكد أن الفرع الرئيسي عندك اسمه main وليس master
+
+jobs:
+  upload_episode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Upload Episode from YouTube To Spotify
+        uses: Schroedinger-Hat/youtube-to-spotify@v2.6.0
+        env:
+          SPOTIFY_EMAIL: ${{ secrets.SPOTIFY_EMAIL }}
+          SPOTIFY_PASSWORD: ${{ secrets.SPOTIFY_PASSWORD }}
+          SPOTIFY_LOGIN: false # استخدم false إذا كنت تسجل دخول بحساب سبوتيفاي مباشرة
+          SAVE_AS_DRAFT: true  # خليها true في البداية للتجربة والتأكد من الحقوق
+          URL_IN_DESCRIPTION: true
+          LOAD_THUMBNAIL: true
+          EPISODE_PATH: /github/workspace
