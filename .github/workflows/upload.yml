@@ -10,23 +10,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
-      # استخدام طريقة الـ Pipe | لضمان كتابة الأسطر المتعددة بشكل صحيح
-      - name: Create Cookies File
+
+      # خطوة برمجية لتحويل الكوكيز من JSON إلى Netscape (TXT)
+      - name: Convert JSON Cookies to Netscape format
+        shell: python
         run: |
-          cat <<EOF > cookies.txt
-          ${{ secrets.YT_COOKIES }}
-          EOF
+          import json
+          import os
+
+          json_cookies = """${{ secrets.YT_COOKIES }}"""
+          cookies = json.loads(json_cookies)
+          
+          with open('cookies.txt', 'w') as f:
+              f.write("# Netscape HTTP Cookie File\n")
+              for cookie in cookies:
+                  domain = cookie.get('domain', '')
+                  # تحويل العلم (Flag) بناءً على النطاق
+                  flag = "TRUE" if domain.startswith('.') else "FALSE"
+                  path = cookie.get('path', '/')
+                  secure = "TRUE" if cookie.get('secure') else "FALSE"
+                  expires = int(cookie.get('expirationDate', 0))
+                  name = cookie.get('name', '')
+                  value = cookie.get('value', '')
+                  f.write(f"{domain}\t{flag}\t{path}\t{secure}\t{expires}\t{name}\t{value}\n")
 
       - name: Upload Episode from YouTube To Spotify
         uses: Schroedinger-Hat/youtube-to-spotify@v2.6.0
         env:
-          SPOTIFY_EMAIL: ${{ secrets.SPOTIFY_EMAIL }}
-          SPOTIFY_PASSWORD: ${{ secrets.SPOTIFY_PASSWORD }}
+          [cite_start]SPOTIFY_EMAIL: ${{ secrets.SPOTIFY_EMAIL }} [cite: 2]
+          [cite_start]SPOTIFY_PASSWORD: ${{ secrets.SPOTIFY_PASSWORD }} [cite: 2]
           SPOTIFY_LOGIN: false
-          SAVE_AS_DRAFT: true
-          # إجبار الأداة على استخدام الكوكيز في كل العمليات عبر الـ POSTPROCESSOR
-          POSTPROCESSOR_ARGS: '--cookies /github/workspace/cookies.txt'
-          EPISODE_PATH: /github/workspace
-          # تحديث الـ User Agent ليتطابق مع متصفحك
+          [cite_start]SAVE_AS_DRAFT: true [cite: 2]
+          # إرسال ملف الكوكيز المحول للمحرك
+          [cite_start]POSTPROCESSOR_ARGS: '--cookies /github/workspace/cookies.txt' [cite: 2]
+          [cite_start]EPISODE_PATH: /github/workspace [cite: 2]
           USER_AGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
