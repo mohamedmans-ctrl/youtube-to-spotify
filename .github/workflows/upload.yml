@@ -3,20 +3,29 @@ on:
   push:
     paths:
       - episode.json
-    branches: [main] # تأكد أن الفرع الرئيسي عندك اسمه main وليس master
+    branches: [main]
 
 jobs:
   upload_episode:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
+      # هذه الخطوة تنشئ ملف الكوكيز وملف الإعدادات
+      - name: Create Cookies and Config
+        run: |
+          echo "${{ secrets.YT_COOKIES }}" > cookies.txt
+          echo "--cookies cookies.txt" > yt-dlp.conf
+
       - name: Upload Episode from YouTube To Spotify
         uses: Schroedinger-Hat/youtube-to-spotify@v2.6.0
         env:
           SPOTIFY_EMAIL: ${{ secrets.SPOTIFY_EMAIL }}
           SPOTIFY_PASSWORD: ${{ secrets.SPOTIFY_PASSWORD }}
-          SPOTIFY_LOGIN: false # استخدم false إذا كنت تسجل دخول بحساب سبوتيفاي مباشرة
-          SAVE_AS_DRAFT: true  # خليها true في البداية للتجربة والتأكد من الحقوق
+          SPOTIFY_LOGIN: false
+          SAVE_AS_DRAFT: true
           URL_IN_DESCRIPTION: true
           LOAD_THUMBNAIL: true
           EPISODE_PATH: /github/workspace
+          # يفضل إضافة User Agent ليتطابق مع الكوكيز
+          USER_AGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
