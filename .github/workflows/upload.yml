@@ -11,11 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      # هذه الخطوة تنشئ ملف الكوكيز وملف الإعدادات
-      - name: Create Cookies and Config
+      # استخدام طريقة الـ Pipe | لضمان كتابة الأسطر المتعددة بشكل صحيح
+      - name: Create Cookies File
         run: |
-          echo "${{ secrets.YT_COOKIES }}" > cookies.txt
-          echo "--cookies cookies.txt" > yt-dlp.conf
+          cat <<EOF > cookies.txt
+          ${{ secrets.YT_COOKIES }}
+          EOF
 
       - name: Upload Episode from YouTube To Spotify
         uses: Schroedinger-Hat/youtube-to-spotify@v2.6.0
@@ -24,8 +25,8 @@ jobs:
           SPOTIFY_PASSWORD: ${{ secrets.SPOTIFY_PASSWORD }}
           SPOTIFY_LOGIN: false
           SAVE_AS_DRAFT: true
-          URL_IN_DESCRIPTION: true
-          LOAD_THUMBNAIL: true
+          # إجبار الأداة على استخدام الكوكيز في كل العمليات عبر الـ POSTPROCESSOR
+          POSTPROCESSOR_ARGS: '--cookies /github/workspace/cookies.txt'
           EPISODE_PATH: /github/workspace
-          # يفضل إضافة User Agent ليتطابق مع الكوكيز
-          USER_AGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+          # تحديث الـ User Agent ليتطابق مع متصفحك
+          USER_AGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
