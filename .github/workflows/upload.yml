@@ -7,17 +7,10 @@ on:
 
 jobs:
   upload_episode:
-    runs-on: self-hosted # هذا الأمر يخبر جيت هب بالعمل من جهازك
+    runs-on: self-hosted # إخبار جيت هب باستخدام جهازك MyBravePC
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-      - name: Upload Episode to Spotify
-        uses: Schroedinger-Hat/youtube-to-spotify@v2.6.0
-        env:
-          SPOTIFY_EMAIL: ${{ secrets.SPOTIFY_EMAIL }}
-          SPOTIFY_PASSWORD: ${{ secrets.SPOTIFY_PASSWORD }}
-          SPOTIFY_LOGIN: false
-          # ميزة الـ Self-hosted: سحب الكوكيز "حية" من متصفحك مباشرة
-          POSTPROCESSOR_ARGS: '--cookies-from-browser brave'
-          EPISODE_PATH: ${{ github.workspace }}
-          USER_AGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+      - name: Execute Python Uploader
+        run: python uploader.py # تشغيل الكود مباشرة على نظام ويندوز عندك
